@@ -1,0 +1,324 @@
+create database Hospital;
+use hospital;
+CREATE TABLE PatientRecords (
+    PatientID INT PRIMARY KEY,
+    PatientName VARCHAR(100),
+    Gender VARCHAR(10),
+    Age INT,
+    City VARCHAR(50),
+    Disease VARCHAR(50),
+    BloodPressure INT,
+    Cholesterol INT,
+    BMI DECIMAL(4,2),
+    SmokingStatus VARCHAR(20),
+    TreatmentCost INT,
+    AdmissionDate DATE,
+    DischargeDate DATE
+);
+select * from patientrecords;
+
+#Q1. How many patients are registered in the hospital?
+select count(*) 
+from PatientRecords;
+
+#Q2. What is the average age of patients?
+select avg(Age)
+from PatientRecords;
+
+#Q3. Who is the youngest patient?
+select Age, PatientName
+from PatientRecords
+order by Age
+limit 1;
+
+#Q4. Who is the oldest patient?
+select Age, PatientName
+from PatientRecords
+order by Age desc
+limit 1;
+
+#Q5. How many male and female patients are there?
+select Gender, count(*)
+from PatientRecords
+group by Gender;
+
+#Q6. What percentage of patients are male?
+SELECT COUNT(*)*100 / (select count(*) from PatientRecords) as Percent
+FROM PatientRecords
+WHERE Gender = 'Male';
+
+#Q7. What percentage of patients are female?
+SELECT COUNT(*)*100 / (select count(*) from PatientRecords) as Percent
+FROM PatientRecords
+WHERE Gender = 'Female';
+
+#Q8. Which city contributes the highest number of patients?
+select City, count(City) as contribute
+from PatientRecords
+group by city
+order by contribute desc
+limit 1;
+
+#Q9. Which city contributes the lowest number of patients?
+SELECT City, COUNT(*) AS TotalPatients
+FROM PatientRecords
+GROUP BY City
+ORDER BY TotalPatients
+LIMIT 1;
+
+#Q10. What is the average patient age by city?
+SELECT City,
+ROUND(AVG(Age),2) AS AverageAge
+FROM PatientRecords
+GROUP BY City;
+
+#Q11. Which disease has the highest number of patients?
+SELECT Disease, COUNT(*) AS TotalPatients
+FROM PatientRecords
+GROUP BY Disease
+ORDER BY TotalPatients DESC
+LIMIT 1;
+
+#Q12. Which disease has the lowest number of patients?
+SELECT Disease, COUNT(*) AS TotalPatients
+FROM PatientRecords
+GROUP BY Disease
+ORDER BY TotalPatients
+LIMIT 1;
+
+#Q13. How many patients are diagnosed with Heart Disease?
+SELECT COUNT(*) AS HeartDiseasePatients
+FROM PatientRecords
+WHERE Disease='Heart Disease';
+
+#Q14. How many patients are diagnosed with Diabetes?
+SELECT COUNT(*) AS DiabetesPatients
+FROM PatientRecords
+WHERE Disease='Diabetes';
+
+#Q15. What percentage of patients have Hypertension?
+SELECT
+ROUND((COUNT(*)*100.0)/(SELECT COUNT(*) FROM PatientRecords),2)
+AS HypertensionPercentage
+FROM PatientRecords
+WHERE Disease='Hypertension';
+
+#Q16. Average age by disease
+SELECT Disease,
+ROUND(AVG(Age),2) AS AverageAge
+FROM PatientRecords
+GROUP BY Disease;
+
+#Q17. Disease affecting the oldest patients on average
+SELECT Disease,
+ROUND(AVG(Age),2) AS AverageAge
+FROM PatientRecords
+GROUP BY Disease
+ORDER BY AverageAge DESC
+LIMIT 1;
+
+#Q18. Disease affecting the youngest patients on average
+SELECT Disease,
+ROUND(AVG(Age),2) AS AverageAge
+FROM PatientRecords
+GROUP BY Disease
+ORDER BY AverageAge
+LIMIT 1;
+
+#Q19. Disease distribution across cities
+SELECT City, Disease, COUNT(*) AS TotalPatients
+FROM PatientRecords
+GROUP BY City, Disease
+ORDER BY City;
+
+#Q20. City with highest Heart Disease patients
+SELECT City, COUNT(*) AS HeartPatients
+FROM PatientRecords
+WHERE Disease='Heart Disease'
+GROUP BY City
+ORDER BY HeartPatients DESC
+LIMIT 1;
+
+#Q21. Total treatment revenue
+SELECT SUM(TreatmentCost) AS TotalRevenue
+FROM PatientRecords;
+
+#Q22. Average treatment cost
+SELECT ROUND(AVG(TreatmentCost),2) AS AverageTreatmentCost
+FROM PatientRecords;
+
+#Q23. Maximum treatment cost
+SELECT MAX(TreatmentCost) AS MaximumTreatmentCost
+FROM PatientRecords;
+
+#Q24. Minimum treatment cost
+SELECT MIN(TreatmentCost) AS MinimumTreatmentCost
+FROM PatientRecords;
+
+#Q25. Disease generating highest revenue
+SELECT Disease,
+SUM(TreatmentCost) AS Revenue
+FROM PatientRecords
+GROUP BY Disease
+ORDER BY Revenue DESC
+LIMIT 1;
+
+#Q26. Disease generating lowest revenue
+SELECT Disease,
+SUM(TreatmentCost) AS Revenue
+FROM PatientRecords
+GROUP BY Disease
+ORDER BY Revenue
+LIMIT 1;
+
+#Q27. Average treatment cost by disease
+SELECT Disease,
+ROUND(AVG(TreatmentCost),2) AS AverageCost
+FROM PatientRecords
+GROUP BY Disease;
+
+#Q28. Patient with highest treatment cost
+SELECT PatientName, TreatmentCost
+FROM PatientRecords
+WHERE TreatmentCost=(SELECT MAX(TreatmentCost)
+FROM PatientRecords);
+
+#Q29. City generating highest treatment revenue
+SELECT City,
+SUM(TreatmentCost) AS Revenue
+FROM PatientRecords
+GROUP BY City
+ORDER BY Revenue DESC
+LIMIT 1;
+
+#Q30. Patients with treatment cost above average
+SELECT COUNT(*) AS PatientsAboveAverage
+FROM PatientRecords
+WHERE TreatmentCost >
+(SELECT AVG(TreatmentCost)
+FROM PatientRecords);
+
+#Q31. Average hospital stay duration
+SELECT ROUND(AVG(DATEDIFF(DischargeDate,AdmissionDate)),2)
+AS AverageStay
+FROM PatientRecords;
+
+#Q32. Maximum hospital stay duration
+SELECT MAX(DATEDIFF(DischargeDate,AdmissionDate))
+AS MaximumStay
+FROM PatientRecords;
+
+#Q33. Minimum hospital stay duration
+SELECT MIN(DATEDIFF(DischargeDate,AdmissionDate))
+AS MinimumStay
+FROM PatientRecords;
+
+#Q34. Patient stayed longest
+SELECT PatientName,
+DATEDIFF(DischargeDate,AdmissionDate) AS StayDays
+FROM PatientRecords
+ORDER BY StayDays DESC
+LIMIT 1;
+
+#Q35. Disease with longest average stay
+SELECT Disease,
+ROUND(AVG(DATEDIFF(DischargeDate,AdmissionDate)),2)
+AS AverageStay
+FROM PatientRecords
+GROUP BY Disease
+ORDER BY AverageStay DESC
+LIMIT 1;
+
+#Q36. Disease with shortest average stay
+SELECT Disease,
+ROUND(AVG(DATEDIFF(DischargeDate,AdmissionDate)),2)
+AS AverageStay
+FROM PatientRecords
+GROUP BY Disease
+ORDER BY AverageStay
+LIMIT 1;
+
+#Q37. Average stay by city
+SELECT City,
+ROUND(AVG(DATEDIFF(DischargeDate,AdmissionDate)),2)
+AS AverageStay
+FROM PatientRecords
+GROUP BY City;
+
+#Q38. Patients stayed more than 10 days
+SELECT COUNT(*) AS Patients
+FROM PatientRecords
+WHERE DATEDIFF(DischargeDate,AdmissionDate)>10;
+
+#Q39. Patients stayed less than 5 days
+SELECT COUNT(*) AS Patients
+FROM PatientRecords
+WHERE DATEDIFF(DischargeDate,AdmissionDate)<5;
+
+#Q40. Percentage stayed above average duration
+SELECT
+ROUND((COUNT(*)*100.0)/(SELECT COUNT(*) FROM PatientRecords),2)
+AS Percentage
+FROM PatientRecords
+WHERE DATEDIFF(DischargeDate,AdmissionDate)>
+(
+SELECT AVG(DATEDIFF(DischargeDate,AdmissionDate))
+FROM PatientRecords
+);
+
+#Q41. Average Blood Pressure
+SELECT ROUND(AVG(BloodPressure),2) AS AverageBP
+FROM PatientRecords;
+
+#Q42. Average Cholesterol
+SELECT ROUND(AVG(Cholesterol),2) AS AverageCholesterol
+FROM PatientRecords;
+
+#Q43. Average BMI
+SELECT ROUND(AVG(BMI),2) AS AverageBMI
+FROM PatientRecords;
+
+#Q44. Blood Pressure above 140
+SELECT COUNT(*) AS HighBPPatients
+FROM PatientRecords
+WHERE BloodPressure>140;
+
+#Q45. Cholesterol above 240
+SELECT COUNT(*) AS HighCholesterolPatients
+FROM PatientRecords
+WHERE Cholesterol>240;
+
+#Q46. BMI greater than 30
+SELECT COUNT(*) AS ObesePatients
+FROM PatientRecords
+WHERE BMI>30;
+
+#Q47. Disease with highest average Blood Pressure
+SELECT Disease,
+ROUND(AVG(BloodPressure),2) AS AverageBP
+FROM PatientRecords
+GROUP BY Disease
+ORDER BY AverageBP DESC
+LIMIT 1;
+
+#Q48. Disease with highest average Cholesterol
+SELECT Disease,
+ROUND(AVG(Cholesterol),2) AS AverageCholesterol
+FROM PatientRecords
+GROUP BY Disease
+ORDER BY AverageCholesterol DESC
+LIMIT 1;
+
+#Q49. Disease with highest average BMI
+SELECT Disease,
+ROUND(AVG(BMI),2) AS AverageBMI
+FROM PatientRecords
+GROUP BY Disease
+ORDER BY AverageBMI DESC
+LIMIT 1;
+
+#Q50. Number of smokers and non-smokers
+SELECT SmokingStatus,
+COUNT(*) AS TotalPatients
+FROM PatientRecords
+GROUP BY SmokingStatus;
